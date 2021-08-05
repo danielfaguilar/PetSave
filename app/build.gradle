@@ -66,6 +66,7 @@ dependencies {
 
   // Testing Dependencies
   testImplementation "junit:junit:$junit_version"
+  testImplementation 'org.robolectric:robolectric:4.4'
   androidTestImplementation "androidx.test.ext:junit:$androidx_junit_version"
   androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
 
