@@ -1,6 +1,11 @@
 package com.raywenderlich.android.petsave.common.data.api.interceptors
 
 import android.os.Build
+<<<<<<< HEAD
+=======
+import com.raywenderlich.android.petsave.common.data.api.ApiConstants.ANIMALS_ENDPOINT
+import com.raywenderlich.android.petsave.common.data.api.ApiConstants.AUTH_ENDPOINT
+>>>>>>> 11a222c0578d355924d549cf28162a79d0dca023
 import com.raywenderlich.android.petsave.common.data.preferences.Preferences
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -12,16 +17,25 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+<<<<<<< HEAD
+=======
+import org.mockito.Mockito.`when`
+import org.mockito.Mockito.mock
+>>>>>>> 11a222c0578d355924d549cf28162a79d0dca023
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.time.Instant
 import com.google.common.truth.Truth.*
+<<<<<<< HEAD
 import com.raywenderlich.android.petsave.common.data.api.ApiConstants
 import com.raywenderlich.android.petsave.common.data.api.ApiConstants.ANIMALS_ENDPOINT
 import com.raywenderlich.android.petsave.common.data.api.ApiConstants.AUTH_ENDPOINT
 import com.raywenderlich.android.petsave.common.data.api.ApiParameters
 import com.raywenderlich.android.petsave.common.data.api.utils.JsonReader
 import org.mockito.Mockito.*
+=======
+import com.raywenderlich.android.petsave.common.data.api.ApiParameters
+>>>>>>> 11a222c0578d355924d549cf28162a79d0dca023
 
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE, sdk = [Build.VERSION_CODES.P])
@@ -67,7 +81,11 @@ class AuthenticationInterceptorTest {
             Request.Builder()
                 .url(mockWebServer.url(ANIMALS_ENDPOINT))
                 .build()
+<<<<<<< HEAD
         ).execute()
+=======
+        )
+>>>>>>> 11a222c0578d355924d549cf28162a79d0dca023
 
         // Then
         val request = mockWebServer.takeRequest()
@@ -75,8 +93,12 @@ class AuthenticationInterceptorTest {
         with(request) {
             assertThat(method).isEqualTo("GET")
             assertThat(path).isEqualTo(animalsEndpointPath)
+<<<<<<< HEAD
             assertThat(getHeader(ApiParameters.AUTH_HEADER))
                 .isEqualTo(ApiParameters.TOKEN_TYPE + validToken)
+=======
+            assertThat(getHeader(ApiParameters.AUTH_HEADER)).isEqualTo(ApiParameters.AUTH_HEADER + validToken)
+>>>>>>> 11a222c0578d355924d549cf28162a79d0dca023
         }
     }
 
@@ -90,6 +112,7 @@ class AuthenticationInterceptorTest {
         mockWebServer.dispatcher = getDispatcherForInvalidToken()
 
         // When
+<<<<<<< HEAD
         okHttpClient.newCall(
             Request.Builder()
                 .url(mockWebServer.url(ApiConstants.ANIMALS_ENDPOINT))
@@ -135,11 +158,23 @@ class AuthenticationInterceptorTest {
                 else -> mockResponse.setResponseCode(404)
             }
             return mockResponse
+=======
+        // Then
+    }
+
+    private fun getDispatcherForValidToken() = object : Dispatcher() {
+        override fun dispatch(request: RecordedRequest): MockResponse {
+            return when (request.path) {
+                animalsEndpointPath -> { MockResponse().setResponseCode(200) }
+                else -> { MockResponse().setResponseCode(404) }
+            }
+>>>>>>> 11a222c0578d355924d549cf28162a79d0dca023
         }
     }
 
     private fun getDispatcherForInvalidToken() = object: Dispatcher() {
         override fun dispatch(request: RecordedRequest): MockResponse {
+<<<<<<< HEAD
             val mockResponse = MockResponse()
             when( request.path ) {
                 authEndpointPath -> mockResponse.setResponseCode(200).setBody(JsonReader.getJson("validToken.json"))
@@ -149,6 +184,14 @@ class AuthenticationInterceptorTest {
             return mockResponse
         }
 
+=======
+            return when (request.path) {
+                authEndpointPath -> { MockResponse().setResponseCode(200).setBody("validToken.json") }
+                animalsEndpointPath -> { MockResponse().setResponseCode(200) }
+                else -> { MockResponse().setResponseCode(404) }
+            }
+        }
+>>>>>>> 11a222c0578d355924d549cf28162a79d0dca023
     }
 
 }
