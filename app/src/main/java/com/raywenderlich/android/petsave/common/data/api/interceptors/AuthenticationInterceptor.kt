@@ -56,12 +56,12 @@ class AuthenticationInterceptor @Inject constructor(
         return chain.proceedDeletingTokenIfUnauthorized(interceptedRequest)
     }
 
-    private fun Interceptor.Chain.createAuthenticatedRequest(token: String): Request {
-        return request()
+    private fun Interceptor.Chain.createAuthenticatedRequest(token: String) =
+        request()
             .newBuilder()
             .addHeader(AUTH_HEADER, TOKEN_TYPE + token)
             .build()
-    }
+
     private fun Interceptor.Chain.refreshToken(): Response {
         val url = request()
             .url
