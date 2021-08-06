@@ -14,7 +14,7 @@ data class Animal(
 )
 
 @JvmInline
-value class Id(private val value: Long) {
+value class Id(val value: Long) {
     init {
         validate(value)
     }

@@ -32,27 +32,46 @@
  * THE SOFTWARE.
  */
 
-package com.raywenderlich.android.petsave.common.data.cache
+package com.raywenderlich.android.petsave.common.data.cache.model.cachedanimal
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import com.raywenderlich.android.petsave.common.data.cache.daos.AnimalsDao
-import com.raywenderlich.android.petsave.common.data.cache.daos.OrganizationsDao
-import com.raywenderlich.android.petsave.common.data.cache.model.cachedanimal.*
-import com.raywenderlich.android.petsave.common.data.cache.model.cachedorganization.CachedOrganization
+import androidx.room.Embedded
+import androidx.room.Junction
+import androidx.room.Relation
+import com.raywenderlich.android.petsave.common.domain.model.animal.details.AnimalWithDetails
 
-@Database(
-    entities = [
-        CachedPhoto::class,
-        CachedVideo::class,
-        CachedTag::class,
-        CachedAnimalWithDetails::class,
-        CachedOrganization::class,
-        CachedAnimalTagCrossRef::class
-    ],
-    version = 1
-)
-abstract class PetSaveDatabase : RoomDatabase() {
-  abstract fun organizationsDao(): OrganizationsDao
-  abstract fun animalsDao(): AnimalsDao
+data class CachedAnimalAggregate(
+    @Embedded
+    val animal: CachedAnimalWithDetails,
+    @Relation(
+        parentColumn = "animalId",
+        entityColumn = "animalId"
+    )
+    val photos: List<CachedPhoto>,
+    @Relation(
+        parentColumn = "animalId",
+        entityColumn = "animalId"
+    )
+    val videos: List<CachedVideo>,
+    @Relation(
+        parentColumn = "animalId",
+        entityColumn = "tag",
+        associateBy = Junction(CachedAnimalTagCrossRef::class)
+    )
+    val tags: List<CachedTag>
+) {
+
+    companion object {
+        fun fromDomain(animalWithDetails: AnimalWithDetails): CachedAnimalAggregate {
+            return CachedAnimalAggregate(
+                animal = CachedAnimalWithDetails.fromDomain(animalWithDetails),
+                photos = animalWithDetails.media.photos.map {
+                    CachedPhoto.fromDomain(animalWithDetails.id.value, it)
+                },
+                videos = animalWithDetails.media.videos.map {
+                    CachedVideo.fromDomain(animalWithDetails.id.value, it)
+                },
+                tags =  animalWithDetails.tags.map { CachedTag(it) }
+            )
+        }
+    }
 }
