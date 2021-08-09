@@ -35,7 +35,6 @@
 package com.raywenderlich.android.petsave.common.data.cache.model.cachedanimal
 
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.Index
 
 @Entity(

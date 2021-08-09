@@ -39,6 +39,7 @@ import androidx.room.Room
 import com.raywenderlich.android.petsave.common.data.cache.Cache
 import com.raywenderlich.android.petsave.common.data.cache.PetSaveDatabase
 import com.raywenderlich.android.petsave.common.data.cache.RoomCache
+import com.raywenderlich.android.petsave.common.data.cache.daos.AnimalsDao
 import com.raywenderlich.android.petsave.common.data.cache.daos.OrganizationsDao
 import dagger.Binds
 import dagger.Module
@@ -65,5 +66,11 @@ abstract class CacheModule {
     @Provides
     fun provideOrganizationsDao(petSaveDatabase: PetSaveDatabase): OrganizationsDao =
         petSaveDatabase.organizationsDao()
+
+    @Provides
+    fun providesAnimalsDao(
+      petSaveDatabase: PetSaveDatabase
+    ): AnimalsDao = petSaveDatabase.animalsDao()
+
   }
 }

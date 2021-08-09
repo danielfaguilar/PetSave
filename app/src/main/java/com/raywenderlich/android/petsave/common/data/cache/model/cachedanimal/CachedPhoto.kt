@@ -63,7 +63,7 @@ data class CachedPhoto(
     fun fromDomain(animalId: Long, photo: Media.Photo): CachedPhoto {
       val (medium, full) = photo
 
-      return CachedPhoto(animalId, animalId, medium, full)
+      return CachedPhoto(animalId = animalId, medium = medium, full = full)
     }
   }
 
