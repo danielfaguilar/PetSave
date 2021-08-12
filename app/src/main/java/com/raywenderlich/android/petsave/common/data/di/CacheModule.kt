@@ -47,6 +47,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -56,7 +57,7 @@ abstract class CacheModule {
   abstract fun bindCache(cache: RoomCache): Cache
 
   companion object {
-
+    @Singleton
     @Provides
     fun provideDatabase(@ApplicationContext context: Context): PetSaveDatabase {
       return Room.databaseBuilder(context, PetSaveDatabase::class.java, "petsave.db")

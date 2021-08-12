@@ -42,8 +42,8 @@ import io.reactivex.Flowable
 import javax.inject.Inject
 
 class RoomCache @Inject constructor(
-    private val organizationsDao: OrganizationsDao,
-    private val animalsDao: AnimalsDao
+    private val animalsDao: AnimalsDao,
+    private val organizationsDao: OrganizationsDao
 ) : Cache {
 
   override fun storeOrganizations(organizations: List<CachedOrganization>) {

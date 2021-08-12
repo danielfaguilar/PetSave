@@ -44,6 +44,6 @@ interface PetFinderApi {
         @Query(ApiParameters.PAGE) pageToLoad: Int,
         @Query(ApiParameters.LIMIT) pageSize: Int,
         @Query(ApiParameters.LOCATION) postcode: String,
-        @Query(ApiParameters.DISTANCE) maxDistance: Float,
+        @Query(ApiParameters.DISTANCE) maxDistance: Int,
     ): ApiPaginatedAnimals
 }

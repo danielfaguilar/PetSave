@@ -34,13 +34,15 @@
 
 package com.raywenderlich.android.petsave.common.data.api
 
+import com.raywenderlich.android.petsave.BuildConfig
+
 object ApiConstants {
   const val BASE_ENDPOINT = "https://api.petfinder.com/v2/"
   const val AUTH_ENDPOINT = "oauth2/token/"
   const val ANIMALS_ENDPOINT = "animals"
 
-  const val KEY = "INSERT_YOUR_KEY_HERE"
-  const val SECRET = "INSERT_YOUR_SECRET_HERE"
+  const val KEY = BuildConfig.Key
+  const val SECRET = BuildConfig.Sec
 }
 
 object ApiParameters {

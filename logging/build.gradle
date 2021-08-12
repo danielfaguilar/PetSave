@@ -15,9 +15,6 @@ android {
     release {
       minifyEnabled true
     }
-    debug {
-      minifyEnabled false
-    }
   }
 }
 

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "37c96590030c06404c3f4cac91ed59ac",
+    "identityHash": "591677d6659455985bfad1f1b5fc7f8f",
     "entities": [
       {
         "tableName": "photos",
@@ -65,7 +65,7 @@
       },
       {
         "tableName": "videos",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`videoId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `animalId` INTEGER NOT NULL, `video` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`videoId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `animalId` INTEGER NOT NULL, `video` TEXT NOT NULL, FOREIGN KEY(`animalId`) REFERENCES `animals`(`animalId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "videoId",
@@ -92,8 +92,29 @@
           ],
           "autoGenerate": true
         },
-        "indices": [],
-        "foreignKeys": []
+        "indices": [
+          {
+            "name": "index_videos_animalId",
+            "unique": false,
+            "columnNames": [
+              "animalId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_videos_animalId` ON `${TABLE_NAME}` (`animalId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "animals",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "animalId"
+            ],
+            "referencedColumns": [
+              "animalId"
+            ]
+          }
+        ]
       },
       {
         "tableName": "tags",
@@ -408,7 +429,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '37c96590030c06404c3f4cac91ed59ac')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '591677d6659455985bfad1f1b5fc7f8f')"
     ]
   }
 }
