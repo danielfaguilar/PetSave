@@ -35,11 +35,12 @@
 package com.raywenderlich.android.petsave.search.presentation
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
-import androidx.annotation.IdRes
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -51,73 +52,181 @@ import com.raywenderlich.android.petsave.common.domain.model.NoMoreAnimalsExcept
 import com.raywenderlich.android.petsave.common.presentation.AnimalsAdapter
 import com.raywenderlich.android.petsave.common.presentation.Event
 import com.raywenderlich.android.petsave.databinding.FragmentSearchBinding
+import com.raywenderlich.android.petsave.search.domain.usecases.GetSearchFilters
 import dagger.hilt.android.AndroidEntryPoint
-import okio.IOException
 import retrofit2.HttpException
+import java.io.IOException
 
 @AndroidEntryPoint
 class SearchFragment: Fragment() {
+    private val viewModel: SearchFragmentViewModel by viewModels()
+
+    companion object {
+        const val ITEMS_PER_ROW = 2
+    }
 
     private val binding get() = _binding!!
     private var _binding: FragmentSearchBinding? = null
 
-    companion object {
-        private const val ITEMS_PER_ROW = 2
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupUI()
-        // TODO: call prepareForSearch method here
+        prepareForSearch()
     }
 
     private fun setupUI() {
-        val adapter = createAdapter()
-        setupRecyclerView(adapter)
+        val adapter = createAnimalsAdapter()
+        setupRecyclerView( adapter )
+        prepareForSearch()
         observeViewStateUpdates(adapter)
     }
 
-    private fun createAdapter(): AnimalsAdapter {
-        return AnimalsAdapter()
+    private fun prepareForSearch() {
+        setupFiltersListener()
+        setupSearchViewListener()
+        viewModel.onEvent(SearchEvent.PrepareForSearch)
     }
 
-    private fun setupRecyclerView(searchAdapter: AnimalsAdapter) {
-        binding.searchRecyclerView.apply {
-            adapter = searchAdapter
-            layoutManager = GridLayoutManager(requireContext(), ITEMS_PER_ROW)
-            setHasFixedSize(true)
+    private fun observeViewStateUpdates(
+        adapter: AnimalsAdapter
+    ) {
+        viewModel.state.observe(viewLifecycleOwner) {
+            updateScreenState(it, adapter)
         }
     }
 
-    private fun observeViewStateUpdates(searchAdapter: AnimalsAdapter) {
-        // TODO: observe state updates here
+    private fun updateScreenState(newState: SearchViewState, adapter: AnimalsAdapter) {
+        val (
+            inInitialState,
+            searchResults,
+            ageFilterValues,
+            typeFilterValues,
+            searchingRemotely,
+            noResultsState,
+            failure
+        ) = newState
+
+        updateInitialStateViews(inInitialState)
+        adapter.submitList(searchResults)
+
+        with(binding.searchWidget) {
+            setupFilterValuesFor(ageDropdown, ageFilterValues.getContentIfNotHandled())
+            setupFilterValuesFor(typeDropdown, typeFilterValues.getContentIfNotHandled())
+        }
+
+        updateRemoteSearchViews(searchingRemotely)
+        updateNoResultsView(noResultsState)
+        handleFailures(failure)
+    }
+
+    private fun updateRemoteSearchViews(searchingRemotely: Boolean) {
+        binding.searchRemotelyProgressBar.isVisible = searchingRemotely
+        binding.searchRemotelyText.isVisible = searchingRemotely
+    }
+
+    private fun updateNoResultsView(searchingRemotely: Boolean) {
+        binding.noSearchResultsImageView.isVisible = searchingRemotely
+        binding.noSearchResultsText.isVisible = searchingRemotely
+    }
+
+    private fun setupFilterValuesFor(
+        filter: AutoCompleteTextView,
+        values: List<String>?
+    ) {
+        if(values == null || values.isEmpty()) return
+
+        filter.setAdapter(createFilterAdapter(values))
+        filter.setText(GetSearchFilters.NO_FILTER_SELECTED, false)
+    }
+
+    private fun createFilterAdapter(values: List<String>): ArrayAdapter<String> {
+        return ArrayAdapter(
+            requireContext(),
+            R.layout.dropdown_menu_popup_item,
+            values
+        )
+    }
+
+    private fun updateInitialStateViews(inInitialState: Boolean) {
+        binding.initialSearchImageView.isVisible = inInitialState
+        binding.initialSearchText.isVisible = inInitialState
     }
 
     private fun handleFailures(failure: Event<Throwable>?) {
         val unhandledFailure = failure?.getContentIfNotHandled() ?: return
-
         handleThrowable(unhandledFailure)
     }
 
     private fun handleThrowable(exception: Throwable) {
         val fallbackMessage = getString(R.string.an_error_occurred)
-        val snackbarMessage = when (exception) {
+        val snackBarMessage = when (exception) {
             is NoMoreAnimalsException -> exception.message ?: fallbackMessage
             is IOException, is HttpException -> fallbackMessage
             else -> ""
         }
 
-        if (snackbarMessage.isNotEmpty()) {
-            Snackbar.make(requireView(), snackbarMessage, Snackbar.LENGTH_SHORT).show()
+        if (snackBarMessage.isNotEmpty()) {
+            Snackbar.make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()
         }
+    }
+
+    private fun createAnimalsAdapter() = AnimalsAdapter()
+
+    private fun setupRecyclerView(animalsAdapter: AnimalsAdapter) {
+        binding.searchRecyclerView.apply {
+            adapter = animalsAdapter
+            layoutManager = GridLayoutManager(requireContext(), ITEMS_PER_ROW)
+            setHasFixedSize(true)
+        }
+    }
+
+    private fun setupSearchViewListener() {
+        val searchView = binding.searchWidget.search
+
+        searchView.setOnQueryTextListener(
+            object: SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    viewModel.onEvent(SearchEvent.QueryInput(query.orEmpty()))
+                    searchView.clearFocus()
+                    return true
+                }
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    viewModel.onEvent(SearchEvent.QueryInput(newText.orEmpty()))
+                    return true
+                }
+
+            }
+        )
+    }
+
+    private fun setupFiltersListener() {
+        with(binding.searchWidget) {
+            setupListenerFor(ageDropdown) { age ->
+                viewModel.onEvent(SearchEvent.AgeValueSelected(age))
+            }
+            setupListenerFor(typeDropdown) { type ->
+                viewModel.onEvent(SearchEvent.TypeValueSelected(type))
+            }
+        }
+    }
+
+    private fun setupListenerFor(
+        input: AutoCompleteTextView,
+        block: (input: String) -> Unit
+    ) {
+        input.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, _, position, _ ->
+                block(parent.adapter.getItem(position) as String)
+            }
     }
 
     override fun onDestroyView() {

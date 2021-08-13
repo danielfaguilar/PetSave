@@ -27,4 +27,7 @@ abstract class AnimalsDao {
                 animalAggregate.tags,
             )
     }
+
+    @Query("SELECT DISTINCT type FROM animals")
+    abstract suspend fun getAllTypes(): List<String>
 }

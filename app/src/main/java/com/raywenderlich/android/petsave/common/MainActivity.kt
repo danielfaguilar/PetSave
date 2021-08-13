@@ -83,4 +83,8 @@ class MainActivity : AppCompatActivity() {
   private fun setupBottomNav() {
     binding.bottomNavigation.setupWithNavController(navController)
   }
+
+  override fun onBackPressed() {
+    super.finishAfterTransition()
+  }
 }

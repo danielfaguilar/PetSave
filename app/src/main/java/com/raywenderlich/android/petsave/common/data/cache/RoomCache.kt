@@ -57,4 +57,8 @@ class RoomCache @Inject constructor(
     override suspend fun storeNearbyAnimals(animals: List<CachedAnimalAggregate>) {
         animalsDao.insertAnimalsWithDetails(animals)
     }
+
+    override suspend fun getAllTypes(): List<String> {
+        return animalsDao.getAllTypes()
+    }
 }

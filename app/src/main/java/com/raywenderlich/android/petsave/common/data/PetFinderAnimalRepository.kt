@@ -8,6 +8,7 @@ import com.raywenderlich.android.petsave.common.data.cache.model.cachedanimal.Ca
 import com.raywenderlich.android.petsave.common.data.cache.model.cachedorganization.CachedOrganization
 import com.raywenderlich.android.petsave.common.domain.model.NetworkException
 import com.raywenderlich.android.petsave.common.domain.model.animal.Animal
+import com.raywenderlich.android.petsave.common.domain.model.animal.details.Age
 import com.raywenderlich.android.petsave.common.domain.model.animal.details.AnimalWithDetails
 import com.raywenderlich.android.petsave.common.domain.model.pagination.PaginatedAnimals
 import com.raywenderlich.android.petsave.common.domain.repositories.AnimalRepository
@@ -67,4 +68,11 @@ class PetFinderAnimalRepository @Inject constructor(
         cache.storeNearbyAnimals(animals.map { CachedAnimalAggregate.fromDomain(it) })
     }
 
+    override suspend fun getAnimalTypes(): List<String> {
+        return cache.getAllTypes()
+    }
+
+    override fun getAnimalAges(): List<Age> {
+        return Age.values().toList()
+    }
 }
