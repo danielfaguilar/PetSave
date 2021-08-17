@@ -163,19 +163,17 @@ class SearchFragment: Fragment() {
 
     private fun handleFailures(failure: Event<Throwable>?) {
         val unhandledFailure = failure?.getContentIfNotHandled() ?: return
-        handleThrowable(unhandledFailure)
-    }
 
-    private fun handleThrowable(exception: Throwable) {
         val fallbackMessage = getString(R.string.an_error_occurred)
-        val snackBarMessage = when (exception) {
-            is NoMoreAnimalsException -> exception.message ?: fallbackMessage
-            is IOException, is HttpException -> fallbackMessage
-            else -> ""
+        val snackbarMessage = if (unhandledFailure.message.isNullOrEmpty()) {
+            fallbackMessage
+        }
+        else {
+            unhandledFailure.message!!
         }
 
-        if (snackBarMessage.isNotEmpty()) {
-            Snackbar.make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()
+        if (snackbarMessage.isNotEmpty()) {
+            Snackbar.make(requireView(), snackbarMessage, Snackbar.LENGTH_SHORT).show()
         }
     }
 

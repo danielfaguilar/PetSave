@@ -2,6 +2,7 @@ package com.raywenderlich.android.petsave.common.data.cache.daos
 
 import androidx.room.*
 import com.raywenderlich.android.petsave.common.data.cache.model.cachedanimal.*
+import com.raywenderlich.android.petsave.search.domain.model.SearchResults
 import io.reactivex.Flowable
 
 @Dao
@@ -30,4 +31,13 @@ abstract class AnimalsDao {
 
     @Query("SELECT DISTINCT type FROM animals")
     abstract suspend fun getAllTypes(): List<String>
+
+    @Transaction
+    @Query("""
+        SELECT * FROM animals
+        WHERE name LIKE '%' || :name || '%'
+        AND age LIKE '%' || :age || '%'
+        AND type LIKE '%' || :type || '%'
+    """)
+    abstract fun searchAnimalsBy(name: String, age: String, type: String): Flowable<List<CachedAnimalAggregate>>
 }

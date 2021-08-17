@@ -32,26 +32,19 @@
  * THE SOFTWARE.
  */
 
-package com.raywenderlich.android.petsave
+package com.raywenderlich.android.petsave.common.data.di
 
-import android.app.Application
-import com.jakewharton.threetenabp.AndroidThreeTen
-import com.raywenderlich.android.logging.Logger
-import dagger.hilt.android.HiltAndroidApp
+import com.raywenderlich.android.petsave.common.data.preferences.FakePreferences
+import com.raywenderlich.android.petsave.common.data.preferences.Preferences
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 
-@HiltAndroidApp
-class PetSaveApplication: Application() {
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class TestPreferencesModule {
 
-  // initiate analytics, crashlytics, etc
-
-  override fun onCreate() {
-    super.onCreate()
-
-    AndroidThreeTen.init(this)
-    initLogger()
-  }
-
-  private fun initLogger() {
-    Logger.init()
-  }
+  @Binds
+  abstract fun providePreferences(preferences: FakePreferences): Preferences
 }

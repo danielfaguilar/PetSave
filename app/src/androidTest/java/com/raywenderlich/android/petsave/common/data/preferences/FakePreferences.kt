@@ -1,7 +1,4 @@
-package com.raywenderlich.android.petsave.common.data.api.preferences
-
-import com.raywenderlich.android.petsave.common.data.preferences.Preferences
-import com.raywenderlich.android.petsave.common.data.preferences.PreferencesConstants
+package com.raywenderlich.android.petsave.common.data.preferences
 
 class FakePreferences : Preferences {
     private val preferences = mutableMapOf<String, Any>()

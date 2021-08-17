@@ -34,24 +34,41 @@
 
 package com.raywenderlich.android.petsave
 
-import android.app.Application
-import com.jakewharton.threetenabp.AndroidThreeTen
-import com.raywenderlich.android.logging.Logger
-import dagger.hilt.android.HiltAndroidApp
+import android.content.ComponentName
+import android.content.Intent
+import android.os.Bundle
+import androidx.annotation.StyleRes
+import androidx.core.util.Preconditions
+import androidx.fragment.app.Fragment
+import androidx.test.core.app.ActivityScenario
+import androidx.test.core.app.ApplicationProvider
 
-@HiltAndroidApp
-class PetSaveApplication: Application() {
+inline fun <reified T : Fragment> launchFragmentInHiltContainer(
+    fragmentArgs: Bundle? = null,
+    @StyleRes themeResId: Int = R.style.FragmentScenarioEmptyFragmentActivityTheme,
+    crossinline action: Fragment.() -> Unit = {}
+) {
+  val startActivityIntent = Intent.makeMainActivity(
+      ComponentName(
+          ApplicationProvider.getApplicationContext(),
+          HiltTestActivity::class.java
+      )
+  )/*.putExtra(
+      "androidx.fragment.app.testing.FragmentScenario.EmptyFragmentActivity.THEME_EXTRAS_BUNDLE_KEY",
+      themeResId
+  )*/
 
-  // initiate analytics, crashlytics, etc
+  ActivityScenario.launch<HiltTestActivity>(startActivityIntent).onActivity { activity ->
+    val fragment: Fragment = activity.supportFragmentManager.fragmentFactory.instantiate(
+        Preconditions.checkNotNull(T::class.java.classLoader),
+        T::class.java.name
+    )
+    fragment.arguments = fragmentArgs
+    activity.supportFragmentManager
+        .beginTransaction()
+        .add(android.R.id.content, fragment, "")
+        .commitNow()
 
-  override fun onCreate() {
-    super.onCreate()
-
-    AndroidThreeTen.init(this)
-    initLogger()
-  }
-
-  private fun initLogger() {
-    Logger.init()
+    fragment.action()
   }
 }

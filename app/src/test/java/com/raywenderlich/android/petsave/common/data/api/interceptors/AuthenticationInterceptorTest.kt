@@ -21,8 +21,6 @@ import org.robolectric.annotation.Config
 import java.time.Instant
 import com.google.common.truth.Truth.*
 import com.raywenderlich.android.petsave.common.data.api.ApiConstants
-import com.raywenderlich.android.petsave.common.data.api.ApiConstants.ANIMALS_ENDPOINT
-import com.raywenderlich.android.petsave.common.data.api.ApiConstants.AUTH_ENDPOINT
 import com.raywenderlich.android.petsave.common.data.api.ApiParameters
 import com.raywenderlich.android.petsave.common.data.api.utils.JsonReader
 import org.mockito.Mockito.*

@@ -51,18 +51,23 @@ import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
-class ApiModule {
+object ApiModule {
 
-  @Provides
-  @Singleton
-  fun provideApi(okHttpClient: OkHttpClient): PetFinderApi {
-    return Retrofit.Builder()
-        .baseUrl(ApiConstants.BASE_ENDPOINT)
-        .client(okHttpClient)
-        .addConverterFactory(MoshiConverterFactory.create())
-        .build()
-        .create(PetFinderApi::class.java)
-  }
+    @Provides
+    @Singleton
+    fun provideApi(builder: Retrofit.Builder): PetFinderApi {
+        return builder
+            .build()
+            .create(PetFinderApi::class.java)
+    }
+
+    @Provides
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit.Builder {
+        return Retrofit.Builder()
+            .baseUrl(ApiConstants.BASE_ENDPOINT)
+            .client(okHttpClient)
+            .addConverterFactory(MoshiConverterFactory.create())
+    }
 
   @Provides
   fun provideOkHttpClient(
